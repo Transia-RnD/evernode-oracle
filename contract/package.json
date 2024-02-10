@@ -9,6 +9,7 @@
         "clean": "hpdevkit clean"
     },
     "dependencies": {
+        "@transia/ever-lmdb-api": "^0.0.3",
         "@transia/hooks-toolkit": "^1.0.12",
         "@transia/xrpl": "^2.7.3-alpha.24",
         "@transia/xrpl-models": "^2.9.1-alpha.0",

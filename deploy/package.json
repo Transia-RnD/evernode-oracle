@@ -2,18 +2,15 @@
     "name": "evernode-oracle-deploy",
     "version": "1.0.0",
     "scripts": {
-        "predeploy": "c2wasm-cli contracts build && node src/index.js",
-        "keygen": "evdevkit keygen",
-        "build": "evdevkit bundle ../contract/dist $EV_USER_PUBLIC_KEY /usr/bin/node -a index.js",
-        "acquire": "evdevkit acquire > instance.json 2> error.log",
-        "deploy": "evdevkit deploy ../contract/bundle/bundle.zip $EV_USER_IP $EV_USER_PORT",
-        "deploy:cluster": "evdevkit cluster-create 3 ../contract/ /usr/bin/node -a index.js"
+        "predeploy": "c2wasm-cli contracts build && node src/index.js"
     },
     "dependencies": {
         "@transia/hooks-toolkit": "^1.0.12",
         "@vercel/ncc": "^0.36.1",
+        "axios": "^1.6.7",
         "dotenv": "^16.3.1",
-        "evernode-js-client": "^0.6.15",
+        "evdevkit": "^0.7.12",
+        "evernode-js-client": "^0.6.34",
         "hotpocket-nodejs-contract": "^0.5.7"
     }
 }

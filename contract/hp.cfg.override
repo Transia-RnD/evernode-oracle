@@ -1,5 +1,7 @@
 {
     "contract": {
+        "bin_path": "/usr/bin/node",
+        "bin_args": "index.js",
         "consensus": {
             "roundtime": 6000
         }
