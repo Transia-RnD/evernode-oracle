@@ -10,13 +10,13 @@ Production Contract Functionality
 */
 async function contract(ctx) {
   const logger = new LogEmitter(`test-${ctx.contractId}`, "contract");
-  console.log("CONTRACT PING");
-  console.log(`CONTRACT ID: ${ctx.contractId}`);
-  console.log(`LEDGER SEQ: ${ctx.lclSeqNo}`);
-  console.log(`LEDGER HASH: ${ctx.lclHash}`);
+  logger.info("CONTRACT PING");
+  logger.info(`CONTRACT ID: ${ctx.contractId}`);
+  logger.info(`LEDGER SEQ: ${ctx.lclSeqNo}`);
+  logger.info(`LEDGER HASH: ${ctx.lclHash}`);
 
   if (ctx.lclSeqNo % 10 === 0) {
-    console.log("RUN ORACLE");
+    logger.info("RUN ORACLE");
     await runOracle(process.env.CURRENCY, process.env.ISSUER);
   }
 }
