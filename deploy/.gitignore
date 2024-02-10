@@ -5,6 +5,10 @@ node_modules
 env/
 instance.json
 keystore.json
+wallet.json
+
+# c2wasm
+/build
 
 # logs
 error.log

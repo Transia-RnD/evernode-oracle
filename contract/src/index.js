@@ -14,20 +14,18 @@ const crypto = require("crypto");
 const { LiquidityCheck } = require("xrpl-orderbook-reader");
 const { XrplClient } = require("xrpl-client");
 const { Users } = require("./models/mock");
+const { OracleArrayModel } = require("./models/OracleArrayModel");
+const { OracleModel } = require("./models/OracleModel");
+const settings = require("./settings.json").settings;
 
-const XRPL_WSS_URI = "ws://localhost:6006";
-const hookAccount = "rNc2De4fwvW2TZxJbNJE97osMDS7SQHB8G";
-const signerSeed = "sne9DmyPVfwWLKQyADZqVeByonn5v";
-const currency = "APL";
-const issuer = "rExKpRKXNz25UAjbckCRtQsJFcSfjL9Er3";
-const amount = 1;
+const amount = 100;
 const liquidityType = "from";
 
 async function getLiquidity(client, currency, issuer, amount, mode) {
   const request = new LiquidityCheck({
     trade: {
       from: {
-        currency: "XRP",
+        currency: "XAH",
       },
       amount: amount,
       to: {
@@ -48,13 +46,12 @@ async function getLiquidity(client, currency, issuer, amount, mode) {
 
 async function runOracle(currency, issuer, amount) {
   try {
-    const client = new XrplClient(XRPL_WSS_URI);
+    const client = new XrplClient(process.env.WSS_XAHAU_ENDPOINT);
     client.on("error", (e) => log(`XRPL Error`, e));
-    const xclient = new Client(XRPL_WSS_URI);
+    const xclient = new Client(process.env.WSS_XAHAU_ENDPOINT);
     await xclient.connect();
     xclient.networkID = await xclient.getNetworkID();
 
-    const signerWallet = Wallet.fromSeed(signerSeed);
     const liquidity = await getLiquidity(
       client,
       currency,
@@ -63,31 +60,30 @@ async function runOracle(currency, issuer, amount) {
       liquidityType
     );
     console.log(liquidity);
-    const xflRate = floatToLEXfl(String(liquidity.rate));
-    const param1 = new iHookParamEntry(
-      new iHookParamName("P"),
-      new iHookParamValue(xflRate, true)
-    );
-    const param2 = new iHookParamEntry(
-      new iHookParamName("SIG"),
-      new iHookParamValue(sign(xflRate, signerWallet.privateKey), true)
-    );
-    const builtTx = {
-      TransactionType: "Invoke",
-      Account: signerWallet.classicAddress,
-      Destination: hookAccount,
-      HookParameters: [param1.toXrpl(), param2.toXrpl()],
-    };
-    const result = await Xrpld.submit(xclient, {
-      wallet: signerWallet,
-      tx: builtTx,
-    });
+    if (liquidity.rate === undefined) {
+      console.log(
+        `No Liquidity Available for '${amount} ${process.env.CURRENCY}'`
+      );
+      return;
+    }
+    const oracleModel = new OracleModel(issuer, currency, liquidity.rate);
+    const oracleArray = new OracleArrayModel([oracleModel]);
 
-    const hookExecutions = await ExecutionUtility.getHookExecutionsFromMeta(
-      xclient,
-      result.meta
+    const builtTx1 = {
+      TransactionType: "Invoke",
+      Account: hookWallet.classicAddress,
+      Blob: oracleArray.encode().slice(2, oracleArray.encode().length),
+    };
+
+    const result1 = await Xrpld.submit(testContext.client, {
+      wallet: hookWallet,
+      tx: builtTx1,
+    });
+    const hookExecutions1 = await ExecutionUtility.getHookExecutionsFromMeta(
+      testContext.client,
+      result1.meta
     );
-    console.log(hookExecutions);
+    console.log(hookExecutions1);
     client.close();
     await xclient.disconnect();
   } catch (error) {
@@ -105,7 +101,7 @@ async function contract(ctx) {
 
   if (ctx.lclSeqNo % 3 === 0) {
     console.log("Calculate Price...");
-    await runOracle(currency, issuer, amount);
+    await runOracle(process.env.CURRENCY, process.env.ISSUER, amount);
   }
 
   for (const user of ctx.users.list()) {

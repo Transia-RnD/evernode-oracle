@@ -1,6 +1,6 @@
 {
     "settings" : {
-        "contractWalletAddress": "rGVfAGdDF9fzsmfePkyHK2HnD25BKMKNbr",
-        "contractWalletSecret": "sswXtv8odxCnUcBwaySJAV6k4ibTk"
+        "address": "rGVfAGdDF9fzsmfePkyHK2HnD25BKMKNbr",
+        "secret": "sswXtv8odxCnUcBwaySJAV6k4ibTk"
     }
 }
