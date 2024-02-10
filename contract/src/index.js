@@ -2,18 +2,15 @@ const { Wallet, Client, dropsToXrp } = require("@transia/xrpl");
 const { sign } = require("@transia/ripple-keypairs");
 const {
   Xrpld,
-  iHookParamEntry,
-  iHookParamName,
-  iHookParamValue,
-  floatToLEXfl,
   ExecutionUtility,
+  generateHash,
 } = require("@transia/hooks-toolkit");
 const { ApiService } = require("./libs/ever-lmdb/api");
 const crypto = require("crypto");
 
 const { LiquidityCheck } = require("xrpl-orderbook-reader");
 const { XrplClient } = require("xrpl-client");
-const { Users } = require("./models/mock");
+const { Users } = require("./__mock__/mock");
 const { OracleArrayModel } = require("./models/OracleArrayModel");
 const { OracleModel } = require("./models/OracleModel");
 const settings = require("./settings.json").settings;
@@ -66,24 +63,36 @@ async function runOracle(currency, issuer, amount) {
       );
       return;
     }
-    const oracleModel = new OracleModel(issuer, currency, liquidity.rate);
+    const oracleModel = new OracleModel(
+      issuer,
+      currency,
+      liquidity.rate.toFixed(2)
+    );
     const oracleArray = new OracleArrayModel([oracleModel]);
-
+    const hookWallet = Wallet.fromSeed(settings.secret);
     const builtTx1 = {
       TransactionType: "Invoke",
       Account: hookWallet.classicAddress,
       Blob: oracleArray.encode().slice(2, oracleArray.encode().length),
     };
-
-    const result1 = await Xrpld.submit(testContext.client, {
+    const result1 = await Xrpld.submit(xclient, {
       wallet: hookWallet,
       tx: builtTx1,
     });
     const hookExecutions1 = await ExecutionUtility.getHookExecutionsFromMeta(
-      testContext.client,
+      xclient,
       result1.meta
     );
     console.log(hookExecutions1);
+
+    const ns = generateHash(
+      Buffer.from(
+        oracleArray.encode().slice(2, oracleArray.encode().length - 16),
+        "hex"
+      )
+    );
+    console.log(ns);
+
     client.close();
     await xclient.disconnect();
   } catch (error) {

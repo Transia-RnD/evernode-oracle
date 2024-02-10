@@ -18,6 +18,12 @@
 
 #include "hookapi.h"
 
+#define ASSERT(x)\
+{\
+    if (!(x))\
+        rollback(0,0,__LINE__);\
+}
+
 int64_t hook(uint32_t reserved)
 {
 
@@ -59,13 +65,12 @@ int64_t hook(uint32_t reserved)
     {
         GUARD(48);
         uint8_t hash[32];
-
         util_sha512h(SBUF(hash), ptr, 40);
         ASSERT(state_set(ptr + 40, 8, hash, 32) == 8);
         ptr += 48;
     }
 
     accept(SBUF("oracle.c: Updated."), __LINE__);
-    // _g(1, 1);
+    _g(1, 1);
     return 0;
 }

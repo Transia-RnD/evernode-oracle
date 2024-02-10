@@ -8,7 +8,7 @@ async function main() {
 
   const hook = hooksToolkit.createHookPayload({
     version: 0,
-    createCode: "oracle",
+    createFile: "oracle",
     namespace: "oracle",
     flags: xrpl.SetHookFlags.hsfOverride,
     hookOnArray: ["Invoke"],

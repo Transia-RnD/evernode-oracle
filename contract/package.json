@@ -9,8 +9,8 @@
         "clean": "hpdevkit clean"
     },
     "dependencies": {
-        "@transia/hooks-toolkit": "^1.0.4",
-        "@transia/xrpl": "^2.7.3-alpha.9",
+        "@transia/hooks-toolkit": "^1.0.12",
+        "@transia/xrpl": "^2.7.3-alpha.24",
         "@transia/xrpl-models": "^2.9.1-alpha.0",
         "@vercel/ncc": "^0.36.1",
         "hotpocket-nodejs-contract": "^0.5.7",
