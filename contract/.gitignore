@@ -4,4 +4,4 @@ bundle/
 dist/
 
 credentials.json
-contract/src/settings.json
+src/settings.json
